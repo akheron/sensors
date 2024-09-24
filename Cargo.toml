@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["controller-esp32", "gateway-sync"]
+members = ["controller-esp32", "gateway-sync", "server"]

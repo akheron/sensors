@@ -66,13 +66,12 @@ fn main() {
             eprintln!("Unable to send data to server after {} retries", retries);
             return;
         }
+        let now = chrono::Utc::now();
 
         let result = client
-            .post(&options.server_url)
+            .post(&options.server_endpoint)
             .basic_auth(&options.username, Some(&options.password))
-            .json(
-                &serde_json::json!({ "sensor_id": options.sensor_id, "temperature": t, "humidity": h }),
-            )
+            .json(&serde_json::json!({ "sensor": options.sensor, "timestamp": now, "temperature": t, "humidity": h }))
             .send();
         if result.is_ok() {
             break;
@@ -97,7 +96,7 @@ struct CmdlineOptions {
 
     /// Server URL to send data to
     #[arg(short, long)]
-    server_url: String,
+    server_endpoint: String,
 
     /// HTTP Basic auth username
     #[arg(short, long)]
@@ -109,7 +108,7 @@ struct CmdlineOptions {
 
     /// Sensor ID
     #[arg(short, long)]
-    sensor_id: String,
+    sensor: String,
 }
 
 fn parse_capture<T>(captures: &Captures, name: &str) -> Option<T>
