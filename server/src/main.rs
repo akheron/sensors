@@ -91,7 +91,7 @@ async fn send_data(
         return (StatusCode::BAD_REQUEST, "Timestamp too old");
     }
 
-    sqlx::query(
+    let result = sqlx::query(
         r#"
 INSERT INTO sensor_data_v1 (sensor_id, timestamp, temperature, humidity)
 SELECT sensor.id, $1, $2, $3
@@ -106,5 +106,9 @@ FROM sensor WHERE sensor.short_name = $4
     .await
     .unwrap();
 
-    (StatusCode::OK, "OK")
+    if result.rows_affected() == 1 {
+        (StatusCode::OK, "OK")
+    } else {
+        (StatusCode::NOT_FOUND, "Sensor not found")
+    }
 }
